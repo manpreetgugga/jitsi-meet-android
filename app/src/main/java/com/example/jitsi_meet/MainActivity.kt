@@ -7,6 +7,7 @@ import com.android.volley.Response
 import com.android.volley.VolleyLog
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import com.google.gson.Gson
 import org.jitsi.meet.sdk.JitsiMeetActivity
 import org.jitsi.meet.sdk.JitsiMeetConferenceOptions
 import org.json.JSONArray
@@ -29,26 +30,28 @@ class MainActivity : JitsiMeetActivity() {
 /*Some example that you can pass your data through request body*/ /*Some example that you can pass your data through request body*/
         val requestQueue = Volley.newRequestQueue(this)
         val jsonBodyObj = JSONObject()
-        val url = "https://domain/video_conference/"
+        val jsonBodyObj2 = JSONObject()
+        val url = "https://josh-meet.herokuapp.com/video_conferences"
         try {
-            jsonBodyObj.put("user", "{\"name\":\"Manpreet\"}")
+            jsonBodyObj2.put("name","Manpreet")
+            jsonBodyObj.put("user", jsonBodyObj2.toString())
         } catch (e: JSONException) {
             e.printStackTrace()
         }
-        val requestBody = jsonBodyObj.toString()
+        val requestBody = "{\"user\": {\n" +
+                " \"name\": \"Manpreet\"\n" +
+                " }\n" +
+                "}"
 
         val jsonObjectRequest: JsonObjectRequest = object : JsonObjectRequest(
             Method.POST,
             url, null,
             Response.Listener { response ->
                 runOnUiThread {
-                    val ja = JSONArray(response)
-                    val serverUrl = ja.getJSONObject(0).getString("domain")
-                    val room = ja.getJSONObject(0).getString("room")
-
+                    val responseJson :ResponseJson= Gson().fromJson(response.toString(),ResponseJson::class.java)
                     val options = JitsiMeetConferenceOptions.Builder()
-                        .setServerURL(URL(serverUrl))
-                        .setRoom(room)
+                        .setServerURL(URL("https://"+responseJson.data?.video_conference?.domain))
+                        .setRoom(responseJson.data?.video_conference?.room)
                         .setAudioMuted(false)
                         .setVideoMuted(false)
                         .setAudioOnly(false)
@@ -64,7 +67,7 @@ class MainActivity : JitsiMeetActivity() {
             override fun getHeaders(): Map<String, String> {
                 val headers =
                     HashMap<String, String>()
-                headers["Content-Type"] = "application/json"
+                headers["content-type"] = "application/json"
                 return headers
             }
 
