@@ -1,6 +1,7 @@
 package com.example.jitsi_meet
 
 import android.os.Bundle
+import android.os.Handler
 import android.widget.Toast
 import com.android.volley.AuthFailureError
 import com.android.volley.Response
@@ -21,8 +22,20 @@ class MainActivity : JitsiMeetActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        initUserCall()
+        initUserCall2()
+    }
+
+    private fun initUserCall2() {
+        val options = JitsiMeetConferenceOptions.Builder()
+            .setServerURL(URL("https://meet.jit.si"))
+            .setRoom("Demo")
+            .setAudioMuted(false)
+            .setVideoMuted(false)
+            .setAudioOnly(false)
+            .setWelcomePageEnabled(false)
+            .build()
+
+        jitsiView.join(options)
     }
 
     private fun initUserCall() {
@@ -33,7 +46,7 @@ class MainActivity : JitsiMeetActivity() {
         val jsonBodyObj2 = JSONObject()
         val url = "https://josh-meet.herokuapp.com/video_conferences"
         try {
-            jsonBodyObj2.put("name","Manpreet")
+            jsonBodyObj2.put("name", "Manpreet")
             jsonBodyObj.put("user", jsonBodyObj2.toString())
         } catch (e: JSONException) {
             e.printStackTrace()
@@ -48,9 +61,10 @@ class MainActivity : JitsiMeetActivity() {
             url, null,
             Response.Listener { response ->
                 runOnUiThread {
-                    val responseJson :ResponseJson= Gson().fromJson(response.toString(),ResponseJson::class.java)
+                    val responseJson: ResponseJson =
+                        Gson().fromJson(response.toString(), ResponseJson::class.java)
                     val options = JitsiMeetConferenceOptions.Builder()
-                        .setServerURL(URL("https://"+responseJson.data?.video_conference?.domain))
+                        .setServerURL(URL("https://" + responseJson.data?.video_conference?.domain))
                         .setRoom(responseJson.data?.video_conference?.room)
                         .setAudioMuted(false)
                         .setVideoMuted(false)

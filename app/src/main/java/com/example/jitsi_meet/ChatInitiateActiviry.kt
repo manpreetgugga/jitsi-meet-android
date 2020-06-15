@@ -2,23 +2,21 @@ package com.example.jitsi_meet
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
+import kotlinx.android.synthetic.main.activity_chat_initiate_activiry.*
 
-class JitsiSplashActivity : AppCompatActivity() {
-
-    val SPLASH_SCREEN_DELAY = 2000L
-
+class ChatInitiateActiviry : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_jitsi_splash)
-        Handler().postDelayed({
-            launchActivity(this, ChatInitiateActiviry::class.java)
+        setContentView(R.layout.activity_chat_initiate_activiry)
+        startCall.setOnClickListener {
+            launchActivity(this, MainActivity::class.java)
             finish()
-        }, SPLASH_SCREEN_DELAY)
+        }
     }
 
     fun launchActivity(activity: AppCompatActivity, aClass: Class<*>) {
         ActivityManager.startFreshActivityClearStack(activity, aClass)
         AppAndroidUtils.startFwdAnimation(activity)
     }
+
 }
